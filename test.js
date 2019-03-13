@@ -1,5 +1,6 @@
 import test from 'ava';
 import chalk from 'chalk';
+import termSize from 'term-size';
 import boxen from '.';
 
 chalk.enabled = true;
@@ -313,4 +314,13 @@ ${dimTopBorder}
 ${dimSide}foo${dimSide}
 ${dimBottomBorder}
 	`);
+});
+
+test('fullscreen', t => {
+	const {columns, rows} = termSize();
+	const box = boxen('foo', {fullscreen: true, padding: 2});
+	const boxColumns = box.split('\n')[0].length;
+	const boxRows = box.split('\n').length;
+	t.is(columns, boxColumns);
+	t.is(rows, boxRows);
 });

@@ -71,7 +71,8 @@ const boxen = (text, opts) => {
 		borderStyle: 'single',
 		dimBorder: false,
 		align: 'left',
-		float: 'left'
+		float: 'left',
+		fullscreen: false
 	}, opts);
 
 	if (opts.borderColor && !isColorValid(opts.borderColor)) {
@@ -84,7 +85,7 @@ const boxen = (text, opts) => {
 
 	const chars = getBorderChars(opts.borderStyle);
 	const padding = getObject(opts.padding);
-	const margin = getObject(opts.margin);
+	const margin = getObject(opts.fullscreen ? 0 : opts.margin);
 
 	const colorizeBorder = x => {
 		const ret = opts.borderColor ? getColorFn(opts.borderColor)(x) : x;
@@ -99,6 +100,7 @@ const boxen = (text, opts) => {
 	const PAD = ' ';
 
 	let lines = text.split(NL);
+	const {columns, rows} = termSize();
 
 	if (padding.top > 0) {
 		lines = new Array(padding.top).fill('').concat(lines);
@@ -108,9 +110,12 @@ const boxen = (text, opts) => {
 		lines = lines.concat(new Array(padding.bottom).fill(''));
 	}
 
-	const contentWidth = widestLine(text) + padding.left + padding.right;
+	if (opts.fullscreen) {
+		lines = lines.concat(new Array(rows - lines.length - 2).fill(''));
+	}
+
 	const paddingLeft = PAD.repeat(padding.left);
-	const {columns} = termSize();
+	const contentWidth = opts.fullscreen ? columns - 2 : widestLine(text) + padding.left + padding.right;
 	let marginLeft = PAD.repeat(margin.left);
 
 	if (opts.float === 'center') {
